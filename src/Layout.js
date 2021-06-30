@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Placeholder,
   VisitorIdentification,
@@ -7,12 +7,9 @@ import {
 import { NavLink, useLocation } from "react-router-dom";
 import { withTranslation } from "react-i18next";
 import Helmet from "react-helmet";
-import { UniformContext } from "@uniformdev/optimize-react";
 import { useSitecoreTracker } from "@uniformdev/tracking-react";
 import { SitecorePersonalizationContextProvider } from "@uniformdev/personalize-react";
 import { doTracking } from "@uniformdev/optimize-js";
-import { getNullLogger } from "@uniformdev/common";
-import { getDefaultConsoleLogger } from "@uniformdev/optimize-common";
 import config from "./temp/config";
 
 // Using bootstrap is completely optional. It's used here to provide a clean layout for samples,
@@ -21,14 +18,8 @@ import "bootstrap/dist/css/bootstrap.css";
 import "./assets/app.css";
 
 const clientSideRouting = false;
-const disableLogging = false;
 const enableEsiDebugging = false;
 const sitecoreApiKey = config.sitecoreApiKey;
-
-function getLogger(name) {
-  if (disableLogging) return getNullLogger();
-  return getDefaultConsoleLogger(name);
-}
 
 /*
   APP LAYOUT
@@ -126,14 +117,6 @@ const LayoutCs = ({ route, sitecoreContext }) => {
     sitecoreContext && sitecoreContext.site
       ? sitecoreContext.site.name
       : undefined;
-  /*** TODO: START BLOCK - REMOVE TO DISABLE UNIFORM CONTEXT LOGGING ***/
-  const ctx = useContext(UniformContext);
-  useEffect(() => {
-    if (!ctx.logger) {
-      ctx.logger = getLogger("context");
-    }
-  }, [ctx.logger]);
-  /*** TODO: END BLOCK - REMOVE TO DISABLE UNIFORM CONTEXT LOGGING ***/
 
   /*** TODO: START BLOCK - CLIENT-SIDE ROUTING ***/
   const [currentRoute, setCurrentRoute] = useState();
@@ -153,8 +136,6 @@ const LayoutCs = ({ route, sitecoreContext }) => {
     scripts: {
       optimize: "/dist/uniform-jss-kit/uniform.optimize.min.js",
     },
-    logger:
-      getLogger("tracker") /*** TODO: REMOVE TO DISABLE TRACKER LOGGING ***/,
   });
   //
   //The tracker should only be called when two conditions are met:
@@ -181,8 +162,7 @@ const LayoutCs = ({ route, sitecoreContext }) => {
     //find the visitor id).
     doTracking({
       source: "sitecore",
-      context: sitecoreContext,
-      debug: true,
+      context: sitecoreContext
     });
   }, [currentRoute, isTrackerInitialized, sitecoreContext]);
   /*** TODO: END BLOCK - CLIENT-SIDE ROUTING ***/
@@ -198,20 +178,10 @@ const LayoutSs = ({ route, sitecoreContext }) => {
     sitecoreContext && sitecoreContext.site
       ? sitecoreContext.site.name
       : undefined;
-  /*** TODO: START BLOCK - REMOVE TO DISABLE UNIFORM CONTEXT LOGGING ***/
-  const ctx = useContext(UniformContext);
-  useEffect(() => {
-    if (!ctx.logger) {
-      ctx.logger = getLogger("context");
-    }
-  }, [ctx.logger]);
-  /*** TODO: END BLOCK - REMOVE TO DISABLE UNIFORM CONTEXT LOGGING ***/
 
   /*** TODO: START BLOCK - SERVER-SIDE ROUTING ***/
   useSitecoreTracker(sitecoreContext, {
-    type: "jss",
-    logger:
-      getLogger("tracker") /*** TODO: REMOVE TO DISABLE TRACKER LOGGING ***/,
+    type: "jss"
   });
   /*** TODO: END BLOCK - SERVER-SIDE ROUTING ***/
   return getComponent(sitecoreContext, siteName, route, location);
@@ -221,9 +191,6 @@ function getComponent(sitecoreContext, siteName, route, location) {
   return (
     <SitecorePersonalizationContextProvider
       contextData={sitecoreContext}
-      logger={getLogger(
-        "global"
-      )} /*** TODO: REMOVE TO DISABLE PERSONALIZATION LOGGING ***/
       personalizationMode="jss-esi"
       sitecoreApiKey={sitecoreApiKey}
       sitecoreSiteName={siteName}
