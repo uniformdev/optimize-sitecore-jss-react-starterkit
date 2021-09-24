@@ -1,0 +1,12 @@
+account_id = "__ACCOUNT_ID__"
+name = "__WORKER_NAME__"
+route = "__WORKER_ROUTE__"
+type = "webpack"
+webpack_config = "./wrangler-webpack.config.js"
+workers_dev = false
+zone_id = "__ZONE_ID__"
+vars = { _DEBUG = "0", _SHOW_ERRORS = "1", _WAIT_FOR_RESPONSE = "0" }
+
+[env.debug]
+vars = { _DEBUG = "1", _SHOW_ERRORS = "1", _WAIT_FOR_RESPONSE = "1" }
+

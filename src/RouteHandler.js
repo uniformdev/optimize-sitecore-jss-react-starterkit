@@ -6,9 +6,11 @@ import config from './temp/config';
 import Layout from './Layout';
 import NotFound from './NotFound';
 import { isExperienceEditorActive, dataApi } from '@sitecore-jss/sitecore-jss-react';
-import SitecoreContextFactory from './lib/SitecoreContextFactory';
 import TestLayout from './TestLayout';
 import queryString from 'query-string';
+import componentFactory from './temp/componentFactory';
+// SitecoreContext: provides component resolution and context services via withSitecoreContext
+import { SitecoreContext } from '@uniformdev/esi-jss-react';
 
 // Dynamic route handler for Sitecore items.
 // Because JSS app routes are defined in Sitecore, traditional static React routing isn't enough -
@@ -27,15 +29,6 @@ export default class RouteHandler extends React.Component {
       routeData: ssrInitialState, // null when client-side rendering
       defaultLanguage: config.defaultLanguage,
     };
-
-    if (ssrInitialState && ssrInitialState.sitecore && ssrInitialState.sitecore.route) {
-      // set the initial sitecore context data if we got SSR initial state
-      SitecoreContextFactory.setSitecoreContext({
-        route: ssrInitialState.sitecore.route,
-        itemId: ssrInitialState.sitecore.route.itemId,
-        ...ssrInitialState.sitecore.context,
-      });
-    }
 
     // route data from react-router - if route was resolved, it's not a 404
     if (props.route !== null) {
@@ -102,11 +95,6 @@ export default class RouteHandler extends React.Component {
     getRouteData(sitecoreRoutePath, language, qs).then((routeData) => {
       if (routeData !== null && routeData.sitecore && routeData.sitecore.route) {
         // set the sitecore context data and push the new route
-        SitecoreContextFactory.setSitecoreContext({
-          route: routeData.sitecore.route,
-          itemId: routeData.sitecore.route.itemId,
-          ...routeData.sitecore.context,
-        });
         this.setState({ routeData, notFound: false });
       } else {
         this.setState({ routeData, notFound: true });
@@ -184,7 +172,9 @@ export default class RouteHandler extends React.Component {
     return routeData.sitecore.route.templateName === 'TestCommonPage' ? (
       <TestLayout route={routeData.sitecore.route} />
     ) : (
-      <Layout route={routeData.sitecore.route} />
+      <SitecoreContext componentFactory={componentFactory} layoutData={routeData}>
+        <Layout route={routeData.sitecore.route} />
+      </SitecoreContext>
     );
   }
 }

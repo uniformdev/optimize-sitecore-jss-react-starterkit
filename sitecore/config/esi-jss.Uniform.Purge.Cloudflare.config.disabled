@@ -1,0 +1,54 @@
+<!--
+    When enabled, Uniform purges Cloudflare Cache for the site after it was successfully deployed.
+    
+    
+-->
+
+<configuration xmlns:set="http://www.sitecore.net/xmlconfig/set/">
+    <sitecore>
+
+        <!-- UNIFORM -->
+        <uniform>
+
+            <siteConfigurations>
+                <siteConfiguration name="uniform-jss-kit">
+
+                    <!-- the original uniform-jss-kit site uses database="master
+                        however Uniform Deploy (is in charge of clearing Cloudflare cache)
+                        requires that <site>'s database attribute value matches the target database
+                        where the authors publish content to ("web") otherwise it will idle.
+                    -->
+                    <site set:inherits="uniform-jss-kit" set:database="web" />
+
+                    <deployment>
+
+                        <!-- for Cloudflare we need a deployment service that will clear cache as the last stage
+                        there are three deployment services available OOB: 
+                        * hostedDeploymentService (full JAMStack approach, connects with self-hosted resource)
+                        * netlifyDeploymentService (full JAMStack approach, connects with Netlify SaaS)
+                        * nopDeploymentService (skips JAMStack phase, only facilitates Cloudflare cache clearing and .timestamp.txt file generation in the wwwroot dir for optional incremental cache clearing feature)
+                        so we use choose nopDeploymentService to only clear Cloudflare cache -->
+                        <deploymentService ref="uniform/services/nopDeploymentService" />
+
+                    </deployment>
+
+                    <purge>
+                        <purgeService set:ref="uniform/services/cloudflarePurgeService">
+                            <apiToken><!>Cloudflare Cache Purge API token<!></apiToken>
+                            <zoneId><!>Cloudflare Zone ID<!></zoneId>
+                            <retriesCount>3</retriesCount>
+                            <hostNames hint="list:AddHostName">
+                                <hostName>http://<!>Cloudflare public host name<!></hostName>
+                                <hostName>https://<!>Cloudflare public host name<!></hostName>
+                            </hostNames>
+                            <changedItemsCount>600</changedItemsCount>
+                        </purgeService>
+                    </purge>
+
+                </siteConfiguration>
+            </siteConfigurations>
+
+        </uniform>
+
+    </sitecore>
+</configuration>
