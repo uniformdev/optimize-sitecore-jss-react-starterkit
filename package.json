@@ -1,7 +1,7 @@
-{
+﻿{
   "name": "@uniformdev/optimize-sitecore-jss-react-starterkit",
   "description": "",
-  "version": "5.1.210920-10",
+  "version": "5.0.0",
   "private": true,
   "config": {
     "appName": "uniform-jss-kit",
@@ -16,17 +16,17 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@sitecore-jss/sitecore-jss-react": "^16.0.0",
-    "@uniformdev/esi-jss-react": "5.1.210920-10",
-    "@uniformdev/esi-jss-ssr": "5.1.210920-10",
-    "@uniformdev/common": "5.1.210920-10",
-    "@uniformdev/optimize-common": "5.1.210920-10",
-    "@uniformdev/personalize": "5.1.210920-10",
-    "@uniformdev/personalize-react": "5.1.210920-10",
-    "@uniformdev/optimize-react": "5.1.210920-10",
-    "@uniformdev/tracking": "5.1.210920-10",
-    "@uniformdev/tracking-react": "5.1.210920-10",
-    "@uniformdev/optimize-js": "5.1.210920-10",
-    "@uniformdev/esi-edge-cloudflare": "5.1.210920-10",
+    "@uniformdev/esi-edge-cloudflare": "6.0.211109-1",
+    "@uniformdev/esi-jss-react": "6.0.211109-1",
+    "@uniformdev/esi-jss-ssr": "6.0.211109-1",
+    "@uniformdev/common": "6.0.211109-1",
+    "@uniformdev/optimize-common-sitecore": "6.0.211109-1",
+    "@uniformdev/personalize": "6.0.211109-1",
+    "@uniformdev/personalize-react": "6.0.211109-1",
+    "@uniformdev/optimize-react": "6.0.211109-1",
+    "@uniformdev/tracking": "6.0.211109-1",
+    "@uniformdev/tracking-react": "6.0.211109-1",
+    "@uniformdev/optimize-js": "6.0.211109-1",
     "apollo-cache-inmemory": "~1.6.3",
     "apollo-client": "~2.6.4",
     "apollo-link": "~1.2.13",
@@ -63,7 +63,7 @@
     "chalk": "~2.4.2",
     "chokidar": "~3.1.1",
     "cross-env": "~6.0.0",
-    "del-cli": "4.0.1",
+    "del-cli": "^2.0.0",
     "fs-extra": "^8.1.0",
     "graphql.macro": "~1.4.2",
     "html-loader": "~0.5.5",
@@ -86,8 +86,7 @@
     "build": "npm-run-all --serial bootstrap:connected build:client build:server",
     "build:client": "cross-env-shell PUBLIC_URL=$npm_package_config_sitecoreDistPath \"react-scripts build\"",
     "build:server": "cross-env-shell NODE_ENV=production \"webpack --config server/server.webpack.config.js\"",
-    "bootstrap:connected": "node scripts/bootstrap.js",
-    "cloudflare:deploy-worker": "node ./scripts/deploy-worker.js"
+    "bootstrap:connected": "node scripts/bootstrap.js"    
   },
   "browserslist": [
     ">0.2%",
@@ -96,3 +95,4 @@
     "not op_mini all"
   ]
 }
+
