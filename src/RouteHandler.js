@@ -1,11 +1,11 @@
 import React from 'react';
 import i18n from 'i18next';
 import Helmet from 'react-helmet';
-import { dataFetcher } from './dataFetcher';
 import config from './temp/config';
 import Layout from './Layout';
 import NotFound from './NotFound';
-import { isExperienceEditorActive, dataApi } from '@sitecore-jss/sitecore-jss-react';
+import { isEditorActive, RestLayoutService } from '@sitecore-jss/sitecore-jss-react';
+import { formatRoute } from './routeUtils';
 import TestLayout from './TestLayout';
 import queryString from 'query-string';
 import componentFactory from './temp/componentFactory';
@@ -90,9 +90,33 @@ export default class RouteHandler extends React.Component {
     }
 
     const language = route?.match?.params?.lang || this.state.defaultLanguage;
-    const qs = queryString.parse(route?.location?.search);
-    // get the route data for the new route
-    getRouteData(sitecoreRoutePath, language, qs).then((routeData) => {
+    const queryStringParams = queryString.parse(route?.location?.search);
+
+    const config = process.env;
+    if (!config.sitecoreApiHost) {
+        throw new Error('missing config.sitecoreApiHost, json: ' + JSON.stringify(config));
+    }
+
+    if (!config.sitecoreApiKey) {
+        throw new Error('missing config.sitecoreApiKey, json: ' + JSON.stringify(config));
+    }
+
+    if (!config.sitecoreSiteName) {
+        throw new Error('missing config.sitecoreSiteName, json: ' + JSON.stringify(config));
+    }
+
+    const layoutServiceConfigNew = {
+        apiHost: config.sitecoreApiHost,
+        apiKey: config.sitecoreApiKey,
+        siteName: config.sitecoreSiteName,
+    };
+
+    const formattedRoute = formatRoute(sitecoreRoutePath);
+
+    const service = new RestLayoutServiceEx(layoutServiceConfigNew, {...queryStringParams});
+
+    // @ts-ignore // type 'HttpResponse<any>' is not assignable to type 'HttpResponse<LayoutServiceData>'
+    service.fetchLayoutData(formattedRoute, language).then((routeData) => {
       if (routeData !== null && routeData.sitecore && routeData.sitecore.route) {
         // set the sitecore context data and push the new route
         this.setState({ routeData, notFound: false });
@@ -137,7 +161,7 @@ export default class RouteHandler extends React.Component {
 
     // if in experience editor - force reload instead of route data update
     // avoids confusing Sitecore's editing JS
-    if (isExperienceEditorActive()) {
+    if (isEditorActive()) {
       window.location.assign(newRoute);
       return;
     }
@@ -188,29 +212,18 @@ export function setServerSideRenderingState(ssrState) {
   ssrInitialState = ssrState;
 }
 
-/**
- * Gets route data from Sitecore. This data is used to construct the component layout for a JSS route.
- * @param {string} route Route path to get data for (e.g. /about)
- * @param {string} language Language to get route data in (content language, e.g. 'en')
- * @param {object} queryStringParameters current query string parameters on the route
- */
-function getRouteData(route, language, queryStringParameters) {
-  const querystringParams = { ...queryStringParameters };
-  querystringParams.sc_lang = language;
-  querystringParams.sc_apikey = config.sitecoreApiKey;
-  const fetchOptions = {
-    layoutServiceConfig: { host: config.sitecoreApiHost },
-    querystringParams,
-    fetcher: dataFetcher,
-  };
 
-  return dataApi.fetchRouteData(route, fetchOptions).catch((error) => {
-    if (error.response && error.response.status === 404 && error.response.data) {
-      return error.response.data;
-    }
+class RestLayoutServiceEx extends RestLayoutService {
 
-    console.error('Route data fetch error', error, error.response);
+    constructor(serviceConfig, queryStringParams) {
+        super(serviceConfig);
 
-    return null;
-  });
+        const superGetFetchParams = this.getFetchParams;
+        this.getFetchParams = (...abc) => {
+            return {
+                ...(superGetFetchParams(...abc)),
+                ...(queryStringParams)
+            };
+        };
+    }    
 }
