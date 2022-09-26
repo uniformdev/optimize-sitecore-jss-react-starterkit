@@ -11,6 +11,12 @@ import queryString from 'query-string';
 import componentFactory from './temp/componentFactory';
 // SitecoreContext: provides component resolution and context services via withSitecoreContext
 import { SitecoreContext } from '@uniformdev/esi-jss-react';
+import {
+  componentFactoryWithUniformPersonalizer
+} from '@uniformdev/esi-jss-react';
+
+export const componentFactoryWithPersonalizer =
+  componentFactoryWithUniformPersonalizer(componentFactory);
 
 // Dynamic route handler for Sitecore items.
 // Because JSS app routes are defined in Sitecore, traditional static React routing isn't enough -
@@ -196,7 +202,7 @@ export default class RouteHandler extends React.Component {
     return routeData.sitecore.route.templateName === 'TestCommonPage' ? (
       <TestLayout route={routeData.sitecore.route} />
     ) : (
-      <SitecoreContext componentFactory={componentFactory} layoutData={routeData}>
+      <SitecoreContext componentFactory={componentFactoryWithPersonalizer} layoutData={routeData}>
         <Layout route={routeData.sitecore.route} />
       </SitecoreContext>
     );
