@@ -4,6 +4,6 @@
   "name": "@uniformdev/cloudflare-worker",
   "description": "A template for kick starting a Cloudflare Workers project",
   "dependencies": {
-    "@uniformdev/esi-edge-cloudflare": "7.2.230222-1"
+    "@uniformdev/esi-edge-cloudflare": "7.3.230626-1"
   }
 }
