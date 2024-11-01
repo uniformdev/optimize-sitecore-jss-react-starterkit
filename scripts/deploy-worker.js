@@ -118,7 +118,7 @@ function copyRecursiveSync(source, dest) {
     var isDirectory = fs.lstatSync(source).isDirectory();
     if (isDirectory) {
         if (!fs.existsSync(dest)) {
-            fs.mkdirSync(dest);
+            fs.mkdirSync(dest, { recursive: true });
         }
 
         fs.readdirSync(source).forEach((child) => {
