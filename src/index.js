@@ -55,7 +55,7 @@ if (__JSS_STATE__) {
 const initialGraphQLState =
   __JSS_STATE__ && __JSS_STATE__.APOLLO_STATE ? __JSS_STATE__.APOLLO_STATE : null;
 
-const graphQLClient = GraphQLClientFactory(config.graphQLEndpoint, false, initialGraphQLState);
+const graphQLClient = GraphQLClientFactory(process.env.GRAPH_QL_ENDPOINT || config.graphQLEndpoint, false, initialGraphQLState);
 
 /*
   App Rendering
