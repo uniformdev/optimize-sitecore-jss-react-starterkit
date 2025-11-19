@@ -49,7 +49,7 @@ console.log('Deploying Cloudflare worker');
 console.log('  APP_ROOT: ' + APP_ROOT);
 console.log('  WORKER_SOURCE_DIR: ' + WORKER_SOURCE_DIR);
 
-console.log('Coping worker files...');
+console.log('Copying worker files...');
 
 ensureCleanDir(WORKER_TEMP_DIR);
 
