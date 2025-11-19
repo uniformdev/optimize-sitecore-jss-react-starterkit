@@ -81,16 +81,16 @@ function transformPackageConfig() {
  */
 function addGraphQLConfig(baseConfig) {
   if (!process.env.GRAPH_QL_ENDPOINT) {
-    if (!baseConfig.graphQLEndpointPath || typeof baseConfig.sitecoreApiHost === 'undefined') {
+    if ((!process.env.GRAPH_QL_ENDPOINT_PATH && !baseConfig.graphQLEndpointPath) || typeof baseConfig.sitecoreApiHost === 'undefined') {
       console.error(
-        'The `graphQLEndpointPath` and/or `layoutServiceHost` configurations were not defined. You may need to run `jss setup`.'
+        'The `GRAPH_QL_ENDPOINT_PATH` and/or `graphQLEndpointPath` and/or `layoutServiceHost` configurations were not defined. You may need to run `jss setup`.'
       );
       process.exit(1);
     }
 
     // eslint-disable-next-line no-param-reassign
     baseConfig.graphQLEndpoint = `${baseConfig.sitecoreApiHost}${
-      baseConfig.graphQLEndpointPath
+      process.env.GRAPH_QL_ENDPOINT_PATH ?? baseConfig.graphQLEndpointPath
     }?sc_apikey=${baseConfig.sitecoreApiKey}`;
   }
 }
